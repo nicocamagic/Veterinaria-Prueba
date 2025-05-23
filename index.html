@@ -174,7 +174,9 @@
             emailjs.send('service_nx5cecf', 'template_m2lr8ab', templateParams)
                 .then(() => alert('Cita agendada y correo enviado'),
                       err => alert('Error al enviar correo: ' + err));
-                      err => console.error('Error al enviar correo:', err)
+                      err => console.error('Error al enviar correo:', + err)
+                      .catch(err => alert(JSON.stringify(err)));
+
 
         }
     </script>
