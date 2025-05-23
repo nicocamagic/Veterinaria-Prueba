@@ -13,6 +13,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      flex-direction: column;
     }
     .container {
       background: #ffffff;
@@ -20,6 +21,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       width: 350px;
+      margin-bottom: 20px;
     }
     h2, h3 {
       text-align: center;
@@ -58,6 +60,12 @@
     .hidden {
       display: none;
     }
+    ul {
+      padding-left: 20px;
+    }
+    ul li {
+      margin-bottom: 8px;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
   <script>
@@ -69,12 +77,18 @@
     <img src="Images/img1.png" alt="Logo Veterinaria" class="logo">
     <div id="register-form">
       <h2>Registro</h2>
-      <label for="reg-pet">Nombre de la mascota</label>
+      <label for="reg-pet">Nombre de la mascota / usuario</label>
       <input type="text" id="reg-pet" required>
       <label for="reg-email">Email</label>
       <input type="email" id="reg-email" required>
       <label for="reg-pass">Contraseña</label>
       <input type="password" id="reg-pass" required>
+      <label for="reg-role">Rol</label>
+      <select id="reg-role" required>
+        <option value="cliente">Cliente</option>
+        <option value="veterinario">Veterinario</option>
+        <option value="admin">Administrador</option>
+      </select>
       <button onclick="register()">Registrarse</button>
       <p>¿Ya tienes cuenta? <a href="#" onclick="toggleForms()">Iniciar sesión</a></p>
     </div>
@@ -89,6 +103,7 @@
     </div>
   </div>
 
+  <!-- Cliente -->
   <div class="container hidden" id="appointment-container">
     <h3 id="petGreeting"></h3>
     <h2>Agendar Cita</h2>
@@ -103,6 +118,28 @@
     <label for="cita-hora">Hora</label>
     <input type="time" id="cita-hora" required>
     <button onclick="schedule()">Agendar</button>
+  </div>
+
+  <!-- Veterinario -->
+  <div class="container hidden" id="vet-container">
+    <h2>Panel Veterinario</h2>
+    <p>Bienvenido, <span id="vet-name"></span></p>
+    <ul>
+      <li>👨‍⚕️ Ver citas agendadas</li>
+      <li>📝 Registrar diagnóstico</li>
+      <li>📋 Ver historial médico</li>
+    </ul>
+  </div>
+
+  <!-- Administrador -->
+  <div class="container hidden" id="admin-container">
+    <h2>Panel Administrador</h2>
+    <p>Bienvenido, <span id="admin-name"></span></p>
+    <ul>
+      <li>📊 Ver estadísticas</li>
+      <li>👥 Gestión de usuarios</li>
+      <li>⚙️ Configuraciones del sistema</li>
+    </ul>
   </div>
 
   <script>
@@ -125,6 +162,7 @@
       const email = document.getElementById('reg-email').value;
       const pass = document.getElementById('reg-pass').value;
       const pet = document.getElementById('reg-pet').value;
+      const role = document.getElementById('reg-role').value;
       let users = getUsers();
 
       if (users.some(u => u.email === email)) {
@@ -132,7 +170,7 @@
         return;
       }
 
-      users.push({ email, pass, pet });
+      users.push({ email, pass, pet, role });
       saveUsers(users);
       alert('Registro exitoso');
       toggleForms();
@@ -147,8 +185,17 @@
       if (user) {
         currentUser = user;
         document.getElementById('auth-container').classList.add('hidden');
-        document.getElementById('appointment-container').classList.remove('hidden');
-        document.getElementById('petGreeting').innerText = `Hola, ${user.pet}`;
+
+        if (user.role === 'cliente') {
+          document.getElementById('appointment-container').classList.remove('hidden');
+          document.getElementById('petGreeting').innerText = `Hola, ${user.pet}`;
+        } else if (user.role === 'veterinario') {
+          document.getElementById('vet-container').classList.remove('hidden');
+          document.getElementById('vet-name').innerText = user.pet;
+        } else if (user.role === 'admin') {
+          document.getElementById('admin-container').classList.remove('hidden');
+          document.getElementById('admin-name').innerText = user.pet;
+        }
       } else {
         alert('Credenciales inválidas');
       }
